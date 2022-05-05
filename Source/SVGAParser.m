@@ -10,7 +10,7 @@
 #import "SVGAVideoEntity.h"
 #import "Svga.pbobjc.h"
 #import <zlib.h>
-#import <SSZipArchive/SSZipArchive.h>
+#import <ZipArchive/ZipArchive.h>
 #import <CommonCrypto/CommonDigest.h>
 
 #define ZIP_MAGIC_NUMBER "PK"
@@ -263,17 +263,17 @@ static NSOperationQueue *unzipQueue;
             NSString *cacheDir = [self cacheDirectory:cacheKey];
             if ([cacheDir isKindOfClass:[NSString class]]) {
                 [[NSFileManager defaultManager] createDirectoryAtPath:cacheDir withIntermediateDirectories:NO attributes:nil error:nil];
-                [SSZipArchive unzipFileAtPath:tmpPath toDestination:[self cacheDirectory:cacheKey] progressHandler:^(NSString * _Nonnull entry, unz_file_info zipInfo, long entryNumber, long total) {
+                
+                ZipArchive *zip = [ZipArchive new];
+                
+                if ([zip UnzipOpenFile:tmpPath]) {
+                    zip.progressBlock = ^(int percentage, int filesProcessed, unsigned long numFiles) {
+                        // 进度
+                    };
                     
-                } completionHandler:^(NSString *path, BOOL succeeded, NSError *error) {
-                    if (error != nil) {
-                        if (failureBlock) {
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                failureBlock(error);
-                            }];
-                        }
-                    }
-                    else {
+                    BOOL result = [zip UnzipFileTo:[self cacheDirectory:cacheKey] overWrite:YES];
+                    
+                    if (result) {
                         if ([[NSFileManager defaultManager] fileExistsAtPath:[cacheDir stringByAppendingString:@"/movie.binary"]]) {
                             NSError *err;
                             NSData *protoData = [NSData dataWithContentsOfFile:[cacheDir stringByAppendingString:@"/movie.binary"]];
@@ -330,8 +330,10 @@ static NSOperationQueue *unzipQueue;
                                 }
                             }
                         }
+                        
+                        [zip UnzipCloseFile];
                     }
-                }];
+                }
             }
             else {
                 if (failureBlock) {
