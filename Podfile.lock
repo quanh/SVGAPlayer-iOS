@@ -4,18 +4,17 @@ PODS:
 
 DEPENDENCIES:
   - Protobuf (~> 3.4)
-  - ZipArchive (= 1.4.0)
+  - ZipArchive
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
-    - Protobuf
   trunk:
+    - Protobuf
     - ZipArchive
 
 SPEC CHECKSUMS:
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
   ZipArchive: e25a4373192673e3229ac8d6e9f64a3e5713c966
 
-PODFILE CHECKSUM: d4bad5d741bc1c00bd055325c43fffa336ec7ed3
+PODFILE CHECKSUM: 98e2ad10c0715bd605637bf26de5cd4dd3ffc0f0
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.16.2
